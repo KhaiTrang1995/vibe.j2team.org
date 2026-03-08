@@ -6,6 +6,7 @@ import HeroSection from '@/components/home/HeroSection.vue'
 import PagesGrid from '@/components/home/PagesGrid.vue'
 
 const heroRef = ref<HTMLElement>()
+const hideCtaRef = ref<HTMLElement>()
 
 const TechStackSection = defineAsyncComponent(
   () => import('@/components/home/TechStackSection.vue'),
@@ -28,10 +29,12 @@ const SiteFooter = defineAsyncComponent(() => import('@/components/home/SiteFoot
     <TechStackSection />
     <ContributeSection />
     <RulesSection />
-    <ProductsSection />
-    <SponsorsSection />
-    <SiteFooter />
-    <FixedCTA :observe-target="heroRef" />
+    <div ref="hideCtaRef">
+      <ProductsSection />
+      <SponsorsSection />
+      <SiteFooter />
+    </div>
+    <FixedCTA :observe-target="heroRef" :hide-target="hideCtaRef" />
     <BackToTop />
   </div>
 </template>

@@ -1,33 +1,57 @@
 <script setup lang="ts">
-import { ref, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 
 const props = defineProps<{
   observeTarget: HTMLElement | undefined
+  hideTarget: HTMLElement | undefined
 }>()
 
-const visible = ref(false)
-let observer: IntersectionObserver | null = null
+const pastHero = ref(false)
+const footerVisible = ref(false)
+const visible = computed(() => pastHero.value && !footerVisible.value)
+
+let heroObserver: IntersectionObserver | null = null
+let footerObserver: IntersectionObserver | null = null
 
 watch(
   () => props.observeTarget,
   (target) => {
-    observer?.disconnect()
+    heroObserver?.disconnect()
     if (!target || typeof IntersectionObserver === 'undefined') return
 
-    observer = new IntersectionObserver(
+    heroObserver = new IntersectionObserver(
       (entries) => {
         const entry = entries[0]
-        if (entry) visible.value = !entry.isIntersecting
+        if (entry) pastHero.value = !entry.isIntersecting
       },
       { threshold: 0 },
     )
-    observer.observe(target)
+    heroObserver.observe(target)
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.hideTarget,
+  (target) => {
+    footerObserver?.disconnect()
+    if (!target || typeof IntersectionObserver === 'undefined') return
+
+    footerObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (entry) footerVisible.value = entry.isIntersecting
+      },
+      { threshold: 0 },
+    )
+    footerObserver.observe(target)
   },
   { immediate: true },
 )
 
 onUnmounted(() => {
-  observer?.disconnect()
+  heroObserver?.disconnect()
+  footerObserver?.disconnect()
 })
 </script>
 
